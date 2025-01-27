@@ -1,0 +1,47 @@
+<!-- list.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>CRUD Example - List</title>
+	<link rel="stylesheet" href="/main.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+	<h1><img src="/database.png" width="128" height="128" />CRUD Example - List</h1>
+	<nav>
+		<ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="/list">View Records</a></li>
+			<li><a href="/add">Add Record</a></li>
+		</ul>
+	</nav>
+	
+	<main>
+		<h2>Records</h2>
+	
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Phone</th>
+					<th>Edit</th>
+					<th>Delete</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% for (var i = 0; i < records.length; i++) { %>
+				<tr>
+					<td><%= records[i].name %></td>
+					<td><%= records[i].email %></td>
+					<td><%= records[i].phone %></td>
+					<td class="icon"><a href="/edit/<%= records[i].id %>"><span class="fa fa-edit fa-3x"></span></a></td>
+					<td class="icon"><a href="/delete/<%= records[i].id %>"><span class="fa fa-close fa-3x"></span></a></td>
+				</tr>
+				<% } %>
+			</tbody>
+		</table>
+	
+	</main>
+	

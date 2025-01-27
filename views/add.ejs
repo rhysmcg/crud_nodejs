@@ -1,0 +1,39 @@
+<!-- add.ejs -->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>CRUD Example - Add</title>
+	<link rel="stylesheet" href="/main.css">
+</head>
+<body>
+	<h1><img src="/adddb.png" width="128" height="128" />CRUD Example - Add</h1>
+
+	<nav>
+		<ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="/list">View Records</a></li>
+			<li><a href="/add">Add Record</a></li>
+		</ul>
+	</nav>
+
+	<main>
+		<h2>Add Record</h2>
+
+		<form method="post" action="/add">
+			<label>Name:</label>
+			<input type="text" name="name" required>
+
+			<label>Email:</label>
+			<input type="email" name="email" required>
+
+			<label>Phone:</label>
+			<input type="tel" name="phone" required>
+
+			<button type="submit">Add Record</button>
+		</form>
+	
+	</main>
+</body>
+</html>

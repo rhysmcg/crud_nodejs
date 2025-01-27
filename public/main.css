@@ -1,0 +1,127 @@
+/* styles.css */
+
+/* Set background of entire page */
+html {
+	background-color: #ccc;
+}
+
+/* Main page body styles - set maximum viewport so it works on wide screens */
+body {
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 0;
+	font-family: Arial, sans-serif;
+	font-size: 16px;
+	line-height: 1.5;
+	color: #333;
+	background-color: #fff;
+}
+
+/* Navigation bar styles */
+nav {
+	background-color: #333;
+	color: #fff;
+}
+
+nav ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	justify-content: center;
+}
+
+nav ul li {
+	margin: 0 10px;
+}
+
+nav ul li a {
+	color: #fff;
+	text-decoration: none;
+}
+
+nav ul li a:hover {
+	color: #333;
+	background-color: #fff;
+}
+
+/* Main content styles */
+main {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+h1 {
+	padding: 1em 2em 0.5em 2em;
+	text-align: center;
+}
+
+main a, main a:visited {
+	color: navy;
+}
+
+main a:hover {
+	color: royalblue;
+}
+
+/* Table styles - centred headings and banded rows */
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+table th,
+table td {
+	padding: 0.5em;
+	text-align: left;
+	border: 1px solid #ccc;
+}
+
+table th {
+	background-color: #333;
+	color: #fff;
+	text-align: center;
+}
+
+/* Table entries with icons in them are centred content */
+table td.icon {
+	text-align: center;
+}
+
+table tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
+
+/* Entry form styles */
+form {
+	display: flex;
+	flex-direction: column;
+	max-width: 400px;
+	margin: 0 auto;
+	padding: 1em;
+	border: 1px solid #ccc;
+}
+
+form label {
+	margin-bottom: 0.5em;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="tel"] {
+	padding: 0.5em;
+	margin-bottom: 1em;
+}
+
+form button {
+	padding: 0.5em;
+	background-color: #333;
+	color: #fff;
+	border: none;
+	cursor: pointer;
+}
+
+form button:hover {
+	background-color: #555;
+}

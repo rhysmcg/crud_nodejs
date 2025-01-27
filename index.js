@@ -1,14 +1,15 @@
-// index.js
-
 const express = require('express');
-const sqlite3 = require('sqlite3');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const path = require('path');
-
+const axios = require('axios'); // Add axios for HTTP requests
+const FormData = require('form-data');
 const app = express();
 
-const db = new sqlite3.Database('database.db');
+const API_KEY = "GxN-8q8EHmK3GDR-y2Z_55Y0JmcBfkUQXUOzZtD__o_gFaJTjd6Q8g";
+const DB_OWNER = 'rhysmcg';
+const DB_NAME = 'database.db';
+const API_URL = 'https://api.dbhub.io/v1';
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -22,26 +23,50 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Set the view engine to use EJS templates
 app.set('view engine', 'ejs');
 
-// Set up the database first, in case nothing is inside it
-db.serialize(function () {
-	// Create a table
-	db.run("CREATE TABLE IF NOT EXISTS Staff (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT)")
-});
+// Helper function to execute SQL commands
+async function executeSQL(sql, method = 'query') {
+	try {
+	    const form = new FormData();
+	    form.append('apikey', API_KEY);
+	    form.append('dbowner', DB_OWNER);
+	    form.append('dbname', DB_NAME);
+	    var sql_encoded = base64Encoded = Buffer.from(sql).toString('base64');
+	    form.append('sql', sql_encoded); // Your SQL query here
+	    const headers = form.getHeaders();
+		const endpoint = `${API_URL}/${method}`;
+		const response = await axios.post(endpoint, form, { headers });
+		console.log(response.data)
+
+		return response.data;
+	} catch (error) {
+		console.error('Database error:', error.response?.data || error.message);
+		throw new Error('Database operation failed');
+	}
+}
 
 // Home page
-app.get('/', function(req, res) {
+app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/views/index.html');
 });
 
 // List all records
-app.get('/list', (req, res) => {
-	db.all('SELECT * FROM Staff', (err, records) => {
-		if (err) {
-			console.error(err);
-			return res.sendStatus(500);
-		}
-		res.render('list', { records });
-	});
+app.get('/list', async (req, res) => {
+	try {
+		const data = await executeSQL('SELECT * FROM Staff');
+		// Transform the result into an array of objects
+		const transformedRecords = data.map(record => {
+			let transformed = {};
+			record.forEach(field => {
+			transformed[field.Name] = field.Value;
+		});
+		return transformed;
+		});
+
+		res.render('list', { records: transformedRecords });
+	} catch (err) {
+		console.error(err);
+		res.sendStatus(500);
+	}
 });
 
 // Add new record page
@@ -50,55 +75,57 @@ app.get('/add', (req, res) => {
 });
 
 // Add new record action
-app.post('/add', (req, res) => {
+app.post('/add', async (req, res) => {
 	const { name, email, phone } = req.body;
-	db.run('INSERT INTO Staff (name, email, phone) VALUES (?, ?, ?)', [name, email, phone], (err) => {
-		if (err) {
-			console.error(err);
-			return res.sendStatus(500);
-		}
+	const sql = `INSERT INTO Staff (name, email, phone) VALUES ('${name}', '${email}', ${phone})`;
+	try {
+		await executeSQL(sql, 'execute');
 		res.redirect('/list');
-	});
+	} catch (err) {
+		console.error(err);
+		res.sendStatus(500);
+	}
 });
 
 // Edit record page
-app.get('/edit/:id', (req, res) => {
+app.get('/edit/:id', async (req, res) => {
 	const id = req.params.id;
-	db.get('SELECT * FROM Staff WHERE id = ?', id, (err, record) => {
-		if (err) {
-			console.error(err);
-			return res.sendStatus(500);
-		}
-		if (!record) {
-			return res.sendStatus(404);
-		}
-		res.render('edit', { record });
-	});
+	const sql = `SELECT * FROM Staff WHERE id = ${id}`;
+	try {
+		const data = await executeSQL(sql);
+		if (data.length === 0) return res.sendStatus(404);
+		res.render('edit', { record: data[0] });
+	} catch (err) {
+		console.error(err);
+		res.sendStatus(500);
+	}
 });
 
 // Edit record action
-app.post('/edit/:id', (req, res) => {
+app.post('/edit/:id', async (req, res) => {
 	const id = req.params.id;
 	const { name, email, phone } = req.body;
-	db.run('UPDATE Staff SET name = ?, email = ?, phone = ? WHERE id = ?', [name, email, phone, id], (err) => {
-		if (err) {
-			console.error(err);
-			return res.sendStatus(500);
-		}
+	const sql = `UPDATE Staff SET name = '${name}', email = '${email}', phone = ${phone} WHERE id = ${id}`;
+	try {
+		await executeSQL(sql, 'execute');
 		res.redirect('/list');
-	});
+	} catch (err) {
+		console.error(err);
+		res.sendStatus(500);
+	}
 });
 
 // Delete record action
-app.get('/delete/:id', (req, res) => {
+app.get('/delete/:id', async (req, res) => {
 	const id = req.params.id;
-	db.run('DELETE FROM Staff WHERE id = ?', id, (err) => {
-		if (err) {
-			console.error(err);
-			return res.sendStatus(500);
-		}
+	const sql = `DELETE FROM Staff WHERE id = ${id}`;
+	try {
+		await executeSQL(sql, 'execute');
 		res.redirect('/list');
-	});
+	} catch (err) {
+		console.error(err);
+		res.sendStatus(500);
+	}
 });
 
 const port = process.env.PORT || 3000;
